@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kedai Kopi - Pesan Online</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: linear-gradient(135deg, #3e2723, #5d4037); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 20px; color: #333; }
+    .container { background: #fff8f0; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); width: 100%; max-width: 520px; overflow: hidden; margin-bottom: 30px; }
+    .header { position: relative; height: 160px; background: #4e342e; overflow: hidden; }
+    .header img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .header-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.75)); color: white; padding: 18px 20px 15px; text-align: center; }
+    .header-overlay h1 { font-size: 24px; margin-bottom: 3px; }
+    .header-overlay p { font-size: 13px; opacity: 0.9; }
+    .content { padding: 22px; }
+    .menu-item { display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+    .menu-info h3 { font-size: 16px; color: #3e2723; }
+    .menu-info p { color: #8d6e63; font-size: 13px; margin-top: 2px; }
+    .qty-control { display: flex; align-items: center; gap: 10px; }
+    .qty-btn { width: 34px; height: 34px; border: none; border-radius: 50%; background: #6d4c41; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .qty { font-size: 17px; font-weight: bold; min-width: 28px; text-align: center; }
+    .delivery-options { margin: 20px 0 12px; }
+    .delivery-options label { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; font-size: 14px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group.hidden { display: none; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #5d4037; font-weight: 600; }
+    .form-group input[type="text"], .form-group input[type="tel"] { width: 100%; padding: 11px 14px; border: 2px solid #d7ccc8; border-radius: 10px; font-size: 14px; outline: none; }
+    .total-box { background: #efebe9; border-radius: 12px; padding: 16px; margin: 18px 0; text-align: center; }
+    .total-box .amount { font-size: 26px; font-weight: bold; color: #3e2723; margin-top: 4px; }
+    .btn-pesan { width: 100%; padding: 15px; background: #4e342e; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .nota { display: none; padding: 22px; background: white; }
+    .nota.show { display: block; }
+    .nota-header { text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 12px; margin-bottom: 12px; }
+    .nota-body p { margin: 7px 0; font-size: 14px; }
+    .nota-items { margin: 12px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 10px 0; }
+    .nota-item { display: flex; justify-content: space-between; margin: 5px 0; }
+    .nota-total { font-size: 17px; font-weight: bold; text-align: right; margin-top: 8px; color: #3e2723; }
+    .payment-box { background: #f8f5f2; border-radius: 14px; padding: 18px; margin-top: 20px; border: 2px dashed #a1887f; text-align: center; }
+    .rekening-number { font-size: 20px; font-weight: bold; color: #3e2723; background: #fff; padding: 9px 14px; border-radius: 10px; display: inline-block; margin: 6px 0; border: 1px solid #d7ccc8; }
+    .btn-copy { background: #6d4c41; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-top: 8px; }
+    .upload-box { margin-top: 20px; padding: 18px; background: #e8f5e9; border-radius: 14px; border: 2px dashed #43a047; text-align: center; }
+    .upload-box h3 { color: #2e7d32; margin-bottom: 10px; font-size: 15px; }
+    .upload-box input[type="file"] { width: 100%; padding: 8px; margin-top: 8px; }
+    .preview-img { max-width: 100%; max-height: 250px; border-radius: 10px; margin-top: 12px; display: none; object-fit: contain; }
+    .contact-box { margin-top: 20px; padding: 18px; background: #e3f2fd; border-radius: 14px; border: 2px dashed #1976d2; text-align: center; }
+    .phone-number { font-size: 20px; font-weight: bold; color: #0d47a1; margin: 8px 0; }
+    .phone-number a { color: #0d47a1; text-decoration: none; }
+    .btn-kembali { width: 100%; padding: 13px; background: #8d6e63; color: white; border: none; border-radius: 10px; margin-top: 18px; cursor: pointer; font-size: 14px; }
+    .saving { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
+    .saved { background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
+    .dashboard { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; padding: 22px; margin: 0; position: relative; }
+    .dashboard.locked { background: #424242; }
+    .dashboard h2 { font-size: 22px; margin-bottom: 18px; text-align: center; font-weight: bold; letter-spacing: 0.5px; }
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dash-card { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; text-align: center; }
+    .dash-card .label { font-size: 12px; opacity: 0.9; }
+    .dash-card .value { font-size: 18px; font-weight: bold; margin-top: 4px; }
+    .dash-card.profit .value { color: #a5d6a7; }
+    .dash-detail { margin-top: 12px; font-size: 13px; background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; }
+    .btn-reset { width: 100%; margin-top: 12px; padding: 8px; background: #c62828; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+    .pass-input { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; margin-bottom: 10px; text-align: center; background: #333; color: white; }
+    .btn-unlock { width: 100%; padding: 10px; background: #66bb6a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
+    .lock-icon { font-size: 28px; text-align: center; margin-bottom: 8px; }
+    .hidden-data { display: none !important; }
+    .visible-data { display: block; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="dashboard locked" id="dashboard">
+    <h2>☕ Kedai Kopi Dashboard</h2>
+    <div id="lock-screen">
+      <div class="lock-icon">🔐</div>
+      <p style="text-align:center; margin-bottom:10px; font-size:14px;">⚠️ Hanya Pemilik yang dapat mengakses data ini</p>
+      <input type="password" id="pass-dashboard" class="pass-input" placeholder="Masukkan Password Pemilik...">
+      <button class="btn-unlock" onclick="cekPassword()">🔓 Buka Dashboard</button>
+    </div>
+    <div id="dash-content" class="hidden-data">
+      <div class="dash-grid">
+        <div class="dash-card"><div class="label">Total Pesanan</div><div class="value" id="dash-gelas">0</div></div>
+        <div class="dash-card"><div class="label">Pendapatan</div><div class="value" id="dash-pendapatan">Rp 0</div></div>
+        <div class="dash-card"><div class="label">Total Modal</div><div class="value" id="dash-modal">Rp 0</div></div>
+        <div class="dash-card profit"><div class="label">Total Profit</div><div class="value" id="dash-profit">Rp 0</div></div>
+      </div>
+      <div class="dash-detail">
+        <div>Big Hot Americano: <span id="dash-hot">0</span></div>
+        <div>Big Ice Americano: <span id="dash-ice">0</span></div>
+        <div>Big Americano Peach Ice: <span id="dash-peach">0</span></div>
+        <div>French Fries: <span id="dash-fries">0</span></div>
+        <div style="margin-top:6px; font-size:12px; opacity:0.85;">Modal per item: Rp 2.700 | Profit per item: Rp 2.300</div>
+      </div>
+      <button class="btn-reset" onclick="resetDashboard()">Reset Data Penjualan</button>
+    </div>
+  </div>
+
+  <div id="form-pesanan">
+    <div class="header">
+      <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80" alt="Kedai Kopi">
+      <div class="header-overlay">
+        <h1>☕ Kedai Kopi</h1>
+        <p>Pesan kopi & camilan favoritmu sekarang</p>
+      </div>
+    </div>
+    <div class="content">
+      <div id="status-simpan"></div>
+      
+      <div class="menu-item">
+        <div class="menu-info"><h3>Big Hot Americano</h3><p>Rp 5.000</p></div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="ubahQty('hot', -1)">−</button>
+          <span class="qty" id="qty-hot">0</span>
+          <button class="qty-btn" onclick="ubahQty('hot', 1)">+</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-info"><h3>Big Ice Americano</h3><p>Rp 5.000</p></div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="ubahQty('ice', -1)">−</button>
+          <span class="qty" id="qty-ice">0</span>
+          <button class="qty-btn" onclick="ubahQty('ice', 1)">+</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-info"><h3>Big Americano Peach — Ice</h3><p>Rp 10.000</p></div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="ubahQty('peach', -1)">−</button>
+          <span class="qty" id="qty-peach">0</span>
+          <button class="qty-btn" onclick="ubahQty('peach', 1)">+</button>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-info"><h3>🍟 French Fries</h3><p>Rp 5.000</p></div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="ubahQty('fries', -1)">−</button>
+          <span class="qty" id="qty-fries">0</span>
+          <button class="qty-btn" onclick="ubahQty('fries', 1)">+</button>
+        </div>
+      </div>
+      
+      <div class="form-group"><label>Nama Pembeli</label><input type="text" id="nama-pembeli" placeholder="Masukkan nama lengkap"></div>
+      <div class="form-group"><label>No. HP Pembeli</label><input type="tel" id="wa-pembeli" placeholder="08xxxxxxxxxx"></div>
+      
+      <div class="delivery-options">
+        <label><input type="radio" name="metode" value="pickup" checked onchange="toggleAlamat()"> Ambil Sendiri (Pick Up)</label>
+        <label><input type="radio" name="metode" value="delivery" onchange="toggleAlamat()"> Diantar</label>
+      </div>
+      
+      <div class="form-group hidden" id="alamat-group"><label>Alamat Pengantaran</label><input type="text" id="alamat" placeholder="Masukkan alamat lengkap"></div>
+      <div class="form-group hidden" id="nomor-group"><label>No. Penerima (jika berbeda)</label><input type="tel" id="nomor" placeholder="08xxxxxxxxxx"></div>
+      
+      <div class="total-box"><h3>Total Pembayaran</h3><div class="amount" id="total">Rp 0</div></div>
+      <button class="btn-pesan" onclick="buatNota()">Buat Nota & Simpan</button>
+    </div>
+  </div>
+
+  <div class="nota" id="nota">
+    <div class="nota-header">
+      <h2>☕ Kedai Kopi</h2>
+      <p>Nota Pembayaran</p>
+      <p id="waktu" style="font-size:13px; margin-top:6px;"></p>
+    </div>
+    <div class="nota-body">
+      <p><strong>Nama Pembeli:</strong> <span id="nota-nama"></span></p>
+      <p><strong>No. HP:</strong> <span id="nota-wa"></span></p>
+      <p><strong>Metode:</strong> <span id="nota-metode"></span></p>
+      <p id="nota-alamat-line" style="display:none;"><strong>Alamat Pengantaran:</strong> <span id="nota-alamat"></span></p>
+      <p id="nota-nomor-line" style="display:none;"><strong>No. Penerima:</strong> <span id="nota-nomor"></span></p>
+      <div class="nota-items" id="nota-items"></div>
+      <div class="nota-total">Total: <span id="nota-total"></span></div>
+    </div>
+    <div class="payment-box">
+      <h3>Pembayaran via Transfer Bank</h3>
+      <div style="text-align:left; font-size:14px; line-height:1.6;">
+        <p><strong>Bank:</strong> Bank Ajaib powered by BANK Sampoerna</p>
+        <p><strong>No. Rekening:</strong></p>
+        <div class="rekening-number">1024019191</div>
+        <br>
+        <button class="btn-copy" onclick="salinRekening()">Salin Nomor Rekening</button>
+        <p style="margin-top:12px;"><strong>Atas Nama:</strong> Rendy Wicaksono</p>
+      </div>
+    </div>
+    <div class="upload-box">
+      <h3>📸 Upload Bukti Pembayaran / Transfer</h3>
+      <input type="file" id="bukti-transfer" accept="image/*">
+      <img id="preview-bukti" class="preview-img" alt="Preview bukti transfer">
+    </div>
+    <div class="contact-box">
+      <h3>Hubungi Kami</h3>
+      <div class="phone-number"><a href="tel:089523333689">089523333689</a></div>
+    </div>
+    <button class="btn-kembali" onclick="kembali()">← Pesan Lagi</button>
+  </div>
+</div>
+
+<script>
+  // ✅ LINK BARU SUDAH DITEMPEL — LANGSUNG PAKAI!
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwKjcZrm4cu8E5LEjL1yA1fUeEpmncdcEO6EN3Q3J8DWGxgzRoGu3tlb8qHJI_3IDRoVg/exec";
+  
+  const PASSWORD_DASHBOARD = "737-900ER";
+  let sudahBuka = false;
+  let qty = { hot: 0, ice: 0, peach: 0, fries: 0 };
+  const harga = { hot: 5000, ice: 5000, peach: 10000, fries: 5000 };
+  const MODAL_PER_ITEM = 2700;
+  const PROFIT_PER_ITEM = 2300;
+
+  function kunciDashboardOtomatis() {
+    sudahBuka = false;
+    document.getElementById('lock-screen').style.display = 'block';
+    document.getElementById('dash-content').classList.remove('visible-data');
+    document.getElementById('dash-content').classList.add('hidden-data');
+    document.getElementById('dashboard').classList.add('locked');
+    document.getElementById('pass-dashboard').value = '';
+  }
+  kunciDashboardOtomatis();
+
+  function cekPassword() {
+    const input = document.getElementById('pass-dashboard').value.trim();
+    if (input === PASSWORD_DASHBOARD) {
+      sudahBuka = true;
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('dash-content').classList.remove('hidden-data');
+      document.getElementById('dash-content').classList.add('visible-data');
+      document.getElementById('dashboard').classList.remove('locked');
+      updateDashboard();
+    } else {
+      alert('❌ Password salah! Hanya Pemilik yang dapat mengakses.');
+      document.getElementById('pass-dashboard').value = '';
+    }
+  }
+  document.getElementById('pass-dashboard').addEventListener('keydown', e => { if (e.key === 'Enter') cekPassword(); });
+
+  async function simpanKeGoogleSheets(data) {
+    const status = document.getElementById('status-simpan');
+    status.innerHTML = '<div class="saving">⏳ Sedang menyimpan data pesanan...</div>';
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      status.innerHTML = '<div class="saved">✅ Data pesanan tersimpan ke Google Sheets!</div>';
+      setTimeout(() => status.innerHTML = '', 3000);
+      return true;
+    } catch (err) {
+      status.innerHTML = '<div class="saving">⚠️ Terjadi kesalahan!</div>';
+      return false;
+    }
+  }
+
+  function getData() {
+    const data = localStorage.getItem('kedai_profit');
+    return data ? JSON.parse(data) : { hot: 0, ice: 0, peach: 0, fries: 0, pendapatan: 0, modal: 0, profit: 0 };
+  }
+  function simpanData(data) { localStorage.setItem('kedai_profit', JSON.stringify(data)); }
+  function updateDashboard() {
+    if (!sudahBuka) return;
+    const data = getData();
+    const totalItem = data.hot + data.ice + data.peach + data.fries;
+    document.getElementById('dash-gelas').textContent = totalItem;
+    document.getElementById('dash-pendapatan').textContent = formatRupiah(data.pendapatan);
+    document.getElementById('dash-modal').textContent = formatRupiah(data.modal);
+    document.getElementById('dash-profit').textContent = formatRupiah(data.profit);
+    document.getElementById('dash-hot').textContent = data.hot;
+    document.getElementById('dash-ice').textContent = data.ice;
+    document.getElementById('dash-peach').textContent = data.peach;
+    document.getElementById('dash-fries').textContent = data.fries;
+  }
+  function catatPenjualan(jumlahHot, jumlahIce, jumlahPeach, jumlahFries) {
+    const data = getData();
+    const totalItem = jumlahHot + jumlahIce + jumlahPeach + jumlahFries;
+    const pendapatan = (jumlahHot * harga.hot) + (jumlahIce * harga.ice) + (jumlahPeach * harga.peach) + (jumlahFries * harga.fries);
+    const modal = totalItem * MODAL_PER_ITEM;
+    const profit = totalItem * PROFIT_PER_ITEM;
+    data.hot += jumlahHot; data.ice += jumlahIce; data.peach += jumlahPeach; data.fries += jumlahFries;
+    data.pendapatan += pendapatan; data.modal += modal; data.profit += profit;
+    simpanData(data);
+    if (sudahBuka) updateDashboard();
+  }
+  function resetDashboard() {
+    if (!sudahBuka) { alert('❌ Hanya Pemilik yang dapat mereset data!'); return; }
+    if (confirm('Yakin ingin menghapus SEMUA data penjualan?')) {
+      localStorage.removeItem('kedai_profit'); updateDashboard(); alert('✅ Data penjualan berhasil direset.');
+    }
+  }
+
+  function ubahQty(item, delta) {
+    qty[item] = Math.max(0, qty[item] + delta);
+    document.getElementById(`qty-${item}`).textContent = qty[item];
+    hitungTotal();
+  }
+  function hitungTotal() {
+    const total = (qty.hot * harga.hot) + (qty.ice * harga.ice) + (qty.peach * harga.peach) + (qty.fries * harga.fries);
+    document.getElementById('total').textContent = formatRupiah(total);
+    return total;
+  }
+  function formatRupiah(angka) { return 'Rp ' + angka.toLocaleString('id-ID'); }
+  function toggleAlamat() {
+    const isDelivery = document.querySelector('input[name="metode"]:checked').value === 'delivery';
+    document.getElementById('alamat-group').classList.toggle('hidden', !isDelivery);
+    document.getElementById('nomor-group').classList.toggle('hidden', !isDelivery);
+  }
+  function salinRekening() {
+    navigator.clipboard.writeText("1024019191").then(() => alert("✅ Nomor rekening disalin:\n1024019191")).catch(() => alert("Salin manual: 1024019191"));
+  }
+
+  const buktiInput = document.getElementById('bukti-transfer');
+  const previewImg = document.getElementById('preview-bukti');
+  buktiInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) { previewImg.style.display = 'none'; return; }
+    if (!file.type.startsWith('image/')) { alert('❌ Pilih file gambar!'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => { previewImg.src = ev.target.result; previewImg.style.display = 'block'; };
+    reader.readAsDataURL(file);
+  });
+
+  async function buatNota() {
+    const total = hitungTotal();
+    if (total === 0) { alert('Pilih minimal 1 menu!'); return; }
+    const nama = document.getElementById('nama-pembeli').value.trim();
+    const wa = document.getElementById('wa-pembeli').value.trim();
+    const metode = document.querySelector('input[name="metode"]:checked').value;
+    const alamat = document.getElementById('alamat').value.trim();
+    const nomor = document.getElementById('nomor').value.trim();
+    const waktu = new Date().toLocaleString('id-ID');
+    
+    if (!nama) { alert('Nama wajib diisi!'); return; }
+    if (!wa) { alert('No. HP wajib diisi!'); return; }
+    if (metode === 'delivery' && !alamat) { alert('Alamat wajib diisi!'); return; }
+
+    await simpanKeGoogleSheets({ waktu, nama, wa, metode, alamat, nomorPenerima: nomor, hot: qty.hot, ice: qty.ice, peach: qty.peach, fries: qty.fries, total });
+    catatPenjualan(qty.hot, qty.ice, qty.peach, qty.fries);
+
+    document.getElementById('waktu').textContent = waktu;
+    document.getElementById('nota-nama').textContent = nama;
+    document.getElementById('nota-wa').textContent = wa;
+    document.getElementById('nota-metode').textConte
